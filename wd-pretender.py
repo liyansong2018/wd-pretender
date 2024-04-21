@@ -11,6 +11,7 @@ from core.definitions import Definitions
 from core.features.delete import DeletePEMockFile
 from core.features.bypass import BypassEDRRule
 from core.features.friendly import AddFriendlyFile
+from core.features.getsign import Getsign
 
 def get_defualt_definition_update_path() -> str:
     logging.info("Getting Signatures Location ...")
@@ -33,6 +34,9 @@ def router(args, definitions: Definitions):
         DeletePEMockFile(definitions.get_anti_spayware_definitions(), hstrs).run()
     elif args.command == 'friendly':
         AddFriendlyFile(definitions.get_anti_spayware_definitions(), args.hash.encode()).run()
+    elif args.command == 'getsign':
+        Getsign(definitions.get_anti_virus_definitions(), args.threat_name).run()
+        exit(0)
     else:
         logging.error(f"Unrecognized command: {args.command}")
         exit(1)
@@ -47,6 +51,9 @@ def argument_parser():
 
     bypass_subparser = subparsers.add_parser('bypass', help='bypass windows defender rules by threat name')
     bypass_subparser.add_argument('threat_name', type=str, help="delete all threats matching <threat_name>")
+
+    getsign_subparser = subparsers.add_parser('getsign', help='get signature by threat name')
+    getsign_subparser.add_argument('threat_name', type=str, help="get signature by all threats matching <threat_name>")
     
     delete_parser = subparsers.add_parser('delete', help='delete file by modifying rules')
     delete_parser.add_argument('string', type=str, help='indication strings within the pefile (base64)')
